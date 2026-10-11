@@ -200,8 +200,8 @@ class MassEditingWizard(models.TransientModel):
         field_element = etree.SubElement(div, "field", field_vals)
         if field.ttype == "one2many":
             comodel = self.env[field.relation]
-            dummy, form_view = comodel._get_view(view_type="form")
-            dummy, list_view = comodel._get_view(view_type="list")
+            _dummy, form_view = comodel._get_view(view_type="form")
+            _dummy, list_view = comodel._get_view(view_type="list")
             field_context = {}
             if form_view:
                 field_context["form_view_ref"] = form_view.xml_id
@@ -210,7 +210,7 @@ class MassEditingWizard(models.TransientModel):
             if field_context:
                 field_element.attrib["context"] = json.dumps(field_context)
             else:
-                model_arch, dummy = self.env[field.model]._get_view(view_type="form")
+                model_arch, _dummy = self.env[field.model]._get_view(view_type="form")
                 embedded_list = None
                 for node in model_arch.xpath(f"//field[@name='{field.name}'][./list]"):
                     embedded_list = node.xpath("./list")[0]
@@ -233,27 +233,32 @@ class MassEditingWizard(models.TransientModel):
 
     @api.model
     def get_views(self, views, options=None):
+        wizard = self
         for view, _type in views:
             if view:
                 view = self.env["ir.ui.view"].sudo().browse(view)
                 server_action = view.mass_server_action_id
-                self = self.with_context(server_action_id=server_action.id)
-        return super().get_views(views, options)
+                wizard = wizard.with_context(server_action_id=server_action.id)
+        return super(MassEditingWizard, wizard).get_views(views, options)
 
     @api.model
     def get_view(self, view_id=None, view_type="form", **options):
         view = self.env["ir.ui.view"].sudo().browse(view_id)
         server_action = view.mass_server_action_id
-        self = self.with_context(server_action_id=server_action.id)
+        wizard = self.with_context(server_action_id=server_action.id)
         if not server_action:
-            return super().get_view(view_id, view_type, **options)
-        result = super().get_view(view_id, view_type, **options)
+            return super(MassEditingWizard, wizard).get_view(
+                view_id, view_type, **options
+            )
+        result = super(MassEditingWizard, wizard).get_view(
+            view_id, view_type, **options
+        )
         arch = etree.fromstring(result["arch"])
         main_xml_group = arch.find('.//group[@name="group_field_list"]')
         for line in server_action.mapped("mass_edit_line_ids"):
-            self._insert_field_in_arch(line, line.field_id, main_xml_group)
+            wizard._insert_field_in_arch(line, line.field_id, main_xml_group)
             if line.field_id.ttype == "one2many":
-                comodel = self.env[line.field_id.relation]
+                comodel = wizard.env[line.field_id.relation]
                 result["models"] = dict(
                     result["models"], **{comodel._name: tuple(comodel.fields_get())}
                 )
