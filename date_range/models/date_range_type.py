@@ -29,7 +29,6 @@ class DateRangeType(models.Model):
     )
     company_id = fields.Many2one(
         comodel_name="res.company",
-        string="Company",
         index=1,
         default=lambda self: self._default_company(),
     )
@@ -147,5 +146,6 @@ class DateRangeType(models.Model):
             except Exception as e:
                 logger.warning(
                     f"Error autogenerating ranges for date range type "
-                    f"{dr_type.name}: {e}"
+                    f"{dr_type.name}: {e}",
+                    exc_info=True,
                 )
