@@ -1,5 +1,7 @@
 # Copyright 2020 Akretion Mourad EL HADJ MIMOUNE
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+import typing
+
 from odoo import api, fields, models
 
 
@@ -14,7 +16,7 @@ class BaseSubstateType(models.Model):
 
 class SaleTest(models.Model):
     _name = "base.substate.test.sale"
-    _inherit = ["base.substate.mixin", "mail.thread"]
+    _inherit: typing.ClassVar[list[str]] = ["base.substate.mixin", "mail.thread"]
     _description = "Base substate Test Model"
 
     name = fields.Char(required=True)
@@ -28,7 +30,7 @@ class SaleTest(models.Model):
         store=True,
     )
     active = fields.Boolean(default=True)
-    partner_id = fields.Many2one("res.partner", string="Partner")
+    partner_id = fields.Many2one("res.partner")
     line_ids = fields.One2many(
         comodel_name="base.substate.test.sale.line",
         inverse_name="sale_id",

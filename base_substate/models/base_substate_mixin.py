@@ -50,10 +50,9 @@ class BaseSubstateMixin(models.AbstractModel):
         if self and not state_val and state_field in self._fields:
             state_val = self[state_field]
 
-        domain = Domain(
+        return Domain(
             "target_state_value_id.target_state_value", "=", state_val
         ) & Domain("target_state_value_id.base_substate_type_id", "=", substate_type.id)
-        return domain
 
     def _get_default_state_value(self):
         """Override this method to change state_value"""
@@ -111,15 +110,13 @@ class BaseSubstateMixin(models.AbstractModel):
 
     def write(self, values):
         values = self._update_before_write_create(values)
-        res = super().write(values)
-        return res
+        return super().write(values)
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             vals = self._update_before_write_create(vals)
-        res = super().create(vals_list)
-        return res
+        return super().create(vals_list)
 
     def _compute_field_value(self, field):
         # OVERRIDE: if ``_state_field`` is computed, it does not go through
