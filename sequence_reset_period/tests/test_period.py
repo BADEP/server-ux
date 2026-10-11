@@ -1,8 +1,9 @@
 # Copyright 2017 Creu Blanca <https://creublanca.es/>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
-from datetime import date, datetime
+from datetime import date
 
+from odoo import fields
 from odoo.tests import common
 
 
@@ -11,7 +12,7 @@ class TestSequence(common.TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.date = date(2018, 3, 14)
-        cls.dt = datetime(2018, 3, 14)
+        cls.dt = fields.Datetime.to_datetime("2018-03-14 00:00:00")
 
     def get_sequence(self, method):
         return self.env["ir.sequence"].create(
@@ -109,7 +110,9 @@ class TestSequence(common.TransactionCase):
         )
         self.assertEqual(
             "00001",
-            sequence.with_context(ir_sequence_date=datetime(2018, 4, 1)).next_by_id(),
+            sequence.with_context(
+                ir_sequence_date=fields.Datetime.to_datetime("2018-04-01 00:00:00")
+            ).next_by_id(),
         )
 
     def test_sequence_padding(self):

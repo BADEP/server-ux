@@ -63,11 +63,10 @@ class IrSequence(models.Model):
         )
         if date_range:
             date_from = date_range.date_to + timedelta(days=1)
-        seq_date_range = (
+        return (
             self.env["ir.sequence.date_range"]
             .sudo()
             .create(
                 {"date_from": date_from, "date_to": date_to, "sequence_id": self.id}
             )
         )
-        return seq_date_range
