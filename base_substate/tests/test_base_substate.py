@@ -9,6 +9,8 @@ from .common import CommonBaseSubstate
 
 @tagged("post_install", "-at_install", "mi_tag")
 class TestBaseSubstate(CommonBaseSubstate):
+    _test_user_groups = None
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
