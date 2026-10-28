@@ -1,6 +1,5 @@
 # Copyright 2020 Akretion Mourad EL HADJ MIMOUNE
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
-import typing
 
 from odoo import api, fields, models
 
@@ -16,7 +15,7 @@ class BaseSubstateType(models.Model):
 
 class SaleTest(models.Model):
     _name = "base.substate.test.sale"
-    _inherit: typing.ClassVar[list[str]] = ["base.substate.mixin", "mail.thread"]
+    _inherit = ["base.substate.mixin", "mail.thread"]  # noqa: RUF012
     _description = "Base substate Test Model"
 
     name = fields.Char(required=True)
